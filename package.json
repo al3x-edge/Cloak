@@ -1,0 +1,7 @@
+{
+  "name": "cloak",
+  "version": "0.0.1",
+  "dependencies": {
+    "nodeload": "0.4.x"
+  }
+}

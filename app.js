@@ -1,20 +1,56 @@
-// This test will hit localhost:8080 with 20 concurrent connections for 10 minutes.
-    var http = require('http'),
-        nl = require('nodeload');
+var v = require('valentine')
+  , Faker = require('Faker')
+  , util = require('util')
+  , exec = require('child_process').exec, child;
 
-    http.createServer(function (req, res) { res.writeHead(200); res.end(); }).listen(8080);
-    console.log("Server to load test listening on 8080.");
+// Globals
+after = function(ms, cb){
+  setTimeout(cb,ms);
+}
+every = function(ms, cb){
+  setInterval(cb, ms);
+}
 
-    var loadtest = nl.run({
-        name: 'Example',
-        host: 'localhost',
-        port: 9000,
-        numClients: 20,
-        timeLimit: 600,
-        targetRps: 200,
-        stats: ['latency', 'result-codes', { name: 'http-errors', successCodes: [200], log: 'http-errors.log' }],
-        requestGenerator: function(client) {
-            return client.request('GET', "/" + Math.floor(Math.random()*10000));
+var team1DNS = '8.8.8.8';
+var team2DNS = '8.8.4.4';
+var team3DNS = '4.3.2.1';
+var dnsServers = [team1DNS,team2DNS,team3DNS];
+
+genSite = function(){
+  var date = new Date();
+  if((date.getSeconds() % 2) === 0) return Faker.Internet.domainWord()+Faker.Internet.domainName()
+  else return 'www.google.com'
+}
+
+// DNS Requests
+every(500, function(){
+  v.each(dnsServers, function(dns){
+    var site = genSite();
+    // Child-Processes should be refactored out.
+    child = exec('dig @'+dns+' +short '+site,
+      function (error, stdout, stderr) {
+        if(stdout.toString() !== "") console.log(stdout.toString());
+        else console.log('No return for '+site)
+        if(stderr) console.log('stderr: ' + stderr);
+        if (error !== null) {
+          console.log('exec error: ' + error);
         }
-    });
-    loadtest.on('end', function() { process.exit(0); });
+    })
+  })
+})
+
+// HTTPS Requests
+
+// HTTP Requests
+
+// FTP Requests
+
+// SSH / SFTP Requests
+
+// SMTP Requests
+// -- Should be one or the other?
+// SMTPS Requests
+
+// POP3
+
+// IMAP

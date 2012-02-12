@@ -2,6 +2,7 @@
   "name": "cloak",
   "version": "0.0.1",
   "dependencies": {
-    "nodeload": "0.4.x"
+    "valentine": "1.4.x",
+    "Faker": "~0.1.3"
   }
 }
